@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#144327"/>
+      <stop offset="60%" stop-color="#0A2A17"/>
+      <stop offset="100%" stop-color="#05180D"/>
+    </radialGradient>
+
+    <!-- Metallic Gold Gradient -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCE8A6"/>
+      <stop offset="25%" stop-color="#E2B755"/>
+      <stop offset="50%" stop-color="#FDF0C3"/>
+      <stop offset="75%" stop-color="#C59328"/>
+      <stop offset="100%" stop-color="#8F620E"/>
+    </linearGradient>
+
+    <linearGradient id="goldTextGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF3CD"/>
+      <stop offset="30%" stop-color="#F3CB6C"/>
+      <stop offset="70%" stop-color="#DCA231"/>
+      <stop offset="100%" stop-color="#A26E12"/>
+    </linearGradient>
+
+    <!-- Nut Gradient -->
+    <linearGradient id="nutGrad" x1="10%" y1="10%" x2="90%" y2="90%">
+      <stop offset="0%" stop-color="#D99B5B"/>
+      <stop offset="35%" stop-color="#A45C27"/>
+      <stop offset="70%" stop-color="#6F3712"/>
+      <stop offset="100%" stop-color="#461F06"/>
+    </linearGradient>
+
+    <linearGradient id="nutKernelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF0D4"/>
+      <stop offset="50%" stop-color="#E2B37A"/>
+      <stop offset="100%" stop-color="#A86E38"/>
+    </linearGradient>
+
+    <!-- Leaf Gradients -->
+    <linearGradient id="leafGradLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#55B242"/>
+      <stop offset="60%" stop-color="#2D7A22"/>
+      <stop offset="100%" stop-color="#184912"/>
+    </linearGradient>
+
+    <linearGradient id="leafGradRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6BC558"/>
+      <stop offset="60%" stop-color="#388E2A"/>
+      <stop offset="100%" stop-color="#1E5716"/>
+    </linearGradient>
+
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Dark Green Background Tile -->
+  <rect width="1024" height="1024" rx="220" fill="url(#bgGrad)"/>
+
+  <!-- Subtle Inner Border Frame -->
+  <rect x="12" y="12" width="1000" height="1000" rx="208" fill="none" stroke="url(#goldGrad)" stroke-width="4" stroke-opacity="0.3"/>
+
+  <!-- Main Graphic Container (Centered) -->
+  <g transform="translate(512, 420)" filter="url(#dropShadow)">
+
+    <!-- Gold Arch / Outer Ring -->
+    <path d="M -260,30 A 260,260 0 1,1 260,30" fill="none" stroke="url(#goldGrad)" stroke-width="18" stroke-linecap="round"/>
+    <path d="M -236,30 A 236,236 0 1,1 236,30" fill="none" stroke="url(#goldGrad)" stroke-width="5" stroke-linecap="round" stroke-opacity="0.7"/>
+
+    <!-- Inner Background Fill for Logo Dome -->
+    <path d="M -250,30 A 250,250 0 1,1 250,30 Z" fill="#082212" opacity="0.4"/>
+
+    <!-- Factory Silhouette (White Line Art & Filled Geometry) -->
+    <g transform="translate(0, -30)" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round">
+
+      <!-- Main Central Factory Structure -->
+      <!-- Smokestack / Chimney -->
+      <path d="M -35,-40 L -35,-190 L -5,-190 L -5,-40" fill="#0E331E" stroke-width="10"/>
+      <path d="M -42,-190 L -2,-190" stroke-width="10"/>
+      <!-- Smoke effect notches -->
+      <path d="M -20,-205 L -20,-225" stroke="#FCE8A6" stroke-width="8" opacity="0.8"/>
+      <path d="M -10,-235 L -10,-250" stroke="#FCE8A6" stroke-width="6" opacity="0.6"/>
+
+      <!-- Factory Roof Peaks & Buildings -->
+      <!-- Left Building -->
+      <path d="M -190,40 L -190,-40 L -130,-90 L -130,40 Z" fill="#0E331E" stroke-width="10"/>
+      <line x1="-170" y1="-30" x2="-150" y2="-30" stroke-width="8"/>
+      <line x1="-170" y1="-10" x2="-150" y2="-10" stroke-width="8"/>
+
+      <!-- Center Main Building -->
+      <path d="M -130,40 L -130,-70 L -40,-70 L -40,-120 L 40,-120 L 40,40 Z" fill="#0E331E" stroke-width="10"/>
+
+      <!-- Right Sawtooth / Gable Roofs -->
+      <path d="M 40,40 L 40,-60 L 100,-100 L 100,-40 L 160,-80 L 160,40 Z" fill="#0E331E" stroke-width="10"/>
+
+      <!-- Windows grid in white -->
+      <g stroke="none" fill="#FFFFFF">
+        <rect x="-110" y="-50" width="16" height="16" rx="2"/>
+        <rect x="-85" y="-50" width="16" height="16" rx="2"/>
+        <rect x="-60" y="-50" width="16" height="16" rx="2"/>
+
+        <rect x="-110" y="-20" width="16" height="16" rx="2"/>
+        <rect x="-85" y="-20" width="16" height="16" rx="2"/>
+        <rect x="-60" y="-20" width="16" height="16" rx="2"/>
+
+        <rect x="60" y="-40" width="14" height="14" rx="2"/>
+        <rect x="80" y="-40" width="14" height="14" rx="2"/>
+        <rect x="120" y="-30" width="14" height="14" rx="2"/>
+      </g>
+    </g>
+
+    <!-- Brazil Nut / Castanha in Center Foreground -->
+    <g transform="translate(0, 30)">
+      <!-- Left Leaf -->
+      <path d="M -20,30 C -90,20 -180,-10 -210,-60 C -190,20 -110,90 -20,30 Z" fill="url(#leafGradLeft)" stroke="#A4E297" stroke-width="3"/>
+      <path d="M -180,-45 C -120,0 -50,25 -20,30" fill="none" stroke="#A4E297" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+
+      <!-- Right Leaf -->
+      <path d="M 20,30 C 90,20 180,-10 210,-60 C 190,20 110,90 20,30 Z" fill="url(#leafGradRight)" stroke="#A4E297" stroke-width="3"/>
+      <path d="M 180,-45 C 120,0 50,25 20,30" fill="none" stroke="#A4E297" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+
+      <!-- Shell/Nut Outer Layer -->
+      <path d="M -140,-20 C -120,-85 -20,-115 50,-110 C 130,-100 170,-30 150,30 C 130,85 10,110 -60,95 C -120,80 -150,20 -140,-20 Z" fill="url(#nutGrad)" stroke="url(#goldGrad)" stroke-width="8"/>
+
+      <!-- Kernel Inner Highlight (Golden Ivory Cream) -->
+      <path d="M -100,-15 C -85,-65 -10,-85 40,-80 C 105,-72 135,-20 120,25 C 105,65 10,85 -45,72 C -90,60 -110,15 -100,-15 Z" fill="url(#nutKernelGrad)"/>
+
+      <!-- Nut Shell Shadow Curve -->
+      <path d="M -125,-10 C -70,25 20,40 100,5" fill="none" stroke="#461F06" stroke-width="14" stroke-linecap="round" opacity="0.7"/>
+      <path d="M -115,-30 C -40,-70 40,-75 110,-45" fill="none" stroke="#FFF5E0" stroke-width="8" stroke-linecap="round" opacity="0.6"/>
+    </g>
+  </g>
+
+  <!-- Typography Block at Bottom -->
+  <g transform="translate(512, 750)" text-anchor="middle" filter="url(#softGlow)">
+    <!-- "USINA" -->
+    <text y="0" font-family="'Montserrat', 'Arial Black', 'Helvetica', sans-serif" font-weight="900" font-size="62" letter-spacing="18" fill="url(#goldTextGrad)">USINA</text>
+
+    <!-- "MONTE" -->
+    <text y="90" font-family="'Montserrat', 'Arial Black', 'Helvetica', sans-serif" font-weight="900" font-size="108" letter-spacing="6" fill="url(#goldTextGrad)">MONTE</text>
+
+    <!-- "DOURADO" -->
+    <text y="180" font-family="'Montserrat', 'Arial Black', 'Helvetica', sans-serif" font-weight="900" font-size="102" letter-spacing="4" fill="url(#goldTextGrad)">DOURADO</text>
+  </g>
+
+  <!-- Bottom Brand Subtitle -->
+  <text x="512" y="975" text-anchor="middle" font-family="'Montserrat', 'Arial', sans-serif" font-weight="800" font-size="30" letter-spacing="10" fill="#A4E297" opacity="0.9">INTEGRAL NUTS</text>
+</svg>

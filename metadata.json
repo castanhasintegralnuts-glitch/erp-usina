@@ -1,0 +1,6 @@
+{
+  "name": "Integral NUTS, Monte Dourado",
+  "description": "Sistema industrial de gestão da Integral NUTS em Monte Dourado, Pará — Módulo 1 (Recebimento) e Módulo de Gestão da Quebra Manual",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
