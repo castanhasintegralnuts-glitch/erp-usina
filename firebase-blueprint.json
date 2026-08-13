@@ -1,0 +1,127 @@
+{
+  "entities": {
+    "clientes": {
+      "title": "Clientes",
+      "description": "Cadastro de clientes e compradores de castanha beneficiada",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "codigo": { "type": "string" },
+        "nome": { "type": "string" },
+        "cpfCnpj": { "type": "string" },
+        "endereco": { "type": "string" },
+        "cidade": { "type": "string" },
+        "telefone": { "type": "string" },
+        "email": { "type": "string" },
+        "inscricaoEstadual": { "type": "string" },
+        "observacoes": { "type": "string" },
+        "dataCadastro": { "type": "string" }
+      },
+      "required": ["id", "codigo", "nome", "cpfCnpj"]
+    },
+    "expedicoes": {
+      "title": "Vendas e Expedições",
+      "description": "Registros de vendas e expedições de castanha",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "codigo": { "type": "string" },
+        "cliente": { "type": "string" },
+        "cpfCnpj": { "type": "string" },
+        "tipoCastanha": { "type": "string" },
+        "produto": { "type": "string" },
+        "pesoKg": { "type": "number" },
+        "caixas": { "type": "number" },
+        "valorTotal": { "type": "number" },
+        "data": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["id", "codigo", "cliente", "valorTotal"]
+    },
+    "estoqueBeneficiada": {
+      "title": "Produtos em Estoque (Castanha Beneficiada)",
+      "description": "Classificação e saldos de produtos beneficiados",
+      "type": "object",
+      "properties": {
+        "tipo": { "type": "string" },
+        "descricao": { "type": "string" },
+        "caixas": { "type": "number" },
+        "pesoKg": { "type": "number" },
+        "ultimoPrecoVenda": { "type": "number" },
+        "precoMedioVenda": { "type": "number" }
+      },
+      "required": ["tipo", "descricao", "caixas", "pesoKg"]
+    },
+    "fornecedores": {
+      "title": "Fornecedores",
+      "description": "Cadastro de extrativistas, produtores e cooperativas",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "codigo": { "type": "string" },
+        "nomeCompleto": { "type": "string" },
+        "cpfCnpj": { "type": "string" },
+        "tipo": { "type": "string" }
+      },
+      "required": ["id", "codigo", "nomeCompleto"]
+    },
+    "compras": {
+      "title": "Ordens de Compra",
+      "description": "Ordens e contratos de compra de castanha",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "codigo": { "type": "string" },
+        "fornecedorNome": { "type": "string" },
+        "valorTotalEstimado": { "type": "number" }
+      },
+      "required": ["id", "codigo"]
+    },
+    "recebimentos": {
+      "title": "Recebimentos",
+      "description": "Entradas de cargas e pesagens físicas",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "codigo": { "type": "string" },
+        "data": { "type": "string" }
+      },
+      "required": ["id", "codigo"]
+    },
+    "contasReceber": {
+      "title": "Contas a Receber",
+      "description": "Financeiro de vendas e clientes",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "codigo": { "type": "string" },
+        "cliente": { "type": "string" },
+        "valorTotal": { "type": "number" }
+      },
+      "required": ["id", "codigo"]
+    },
+    "contasPagar": {
+      "title": "Contas a Pagar",
+      "description": "Financeiro de compras e despesas operacionais",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "codigo": { "type": "string" },
+        "valorTotal": { "type": "number" }
+      },
+      "required": ["id", "codigo"]
+    },
+    "usuarios": {
+      "title": "Usuários",
+      "description": "Usuários e perfis do sistema",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nome": { "type": "string" },
+        "login": { "type": "string" },
+        "perfil": { "type": "string" }
+      },
+      "required": ["id", "nome", "login"]
+    }
+  }
+}

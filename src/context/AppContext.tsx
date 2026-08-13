@@ -1,5 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
+  db,
+  subscribeToCollection,
+  saveDocumentToFirestore,
+  deleteDocumentFromFirestore,
+  syncCollectionToFirestore
+} from '../firebase';
+import {
   Fornecedor,
   Recebimento,
   CompraOrdem,
@@ -106,6 +113,7 @@ interface ToastNotification {
 }
 
 interface AppContextType {
+  isFirebaseConnected: boolean;
   activeTab: ActiveTab;
   setActiveTab: (tab: ActiveTab) => void;
   activePerfil: PerfilUsuario;
@@ -549,6 +557,113 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [selectedLoteId, setSelectedLoteId] = useState<string | null>(null);
 
   const [toasts, setToasts] = useState<ToastNotification[]>([]);
+  const [isFirebaseConnected, setIsFirebaseConnected] = useState<boolean>(false);
+
+  // Real-time Firestore Subscriptions
+  useEffect(() => {
+    let unsubs: (() => void)[] = [];
+
+    try {
+      const unsubClientes = subscribeToCollection<Cliente>('clientes', (data) => {
+        if (data && data.length > 0) {
+          setClientes(data);
+        } else {
+          syncCollectionToFirestore('clientes', INITIAL_CLIENTES);
+        }
+        setIsFirebaseConnected(true);
+      });
+      unsubs.push(unsubClientes);
+
+      const unsubExpedicoes = subscribeToCollection<ExpedicaoItem>('expedicoes', (data) => {
+        if (data && data.length > 0) {
+          setExpedicoes(data);
+        } else {
+          syncCollectionToFirestore('expedicoes', INITIAL_EXPEDICOES);
+        }
+      });
+      unsubs.push(unsubExpedicoes);
+
+      const unsubEstoque = subscribeToCollection<ItemEstoqueBeneficiada>('estoqueBeneficiada', (data) => {
+        if (data && data.length > 0) {
+          setEstoqueBeneficiada(data);
+        } else {
+          syncCollectionToFirestore('estoqueBeneficiada', INITIAL_ESTOQUE_BENEFICIADA, 'tipo');
+        }
+      });
+      unsubs.push(unsubEstoque);
+
+      const unsubRomaneios = subscribeToCollection<RomaneioRetirada>('romaneiosRetirada', (data) => {
+        if (data && data.length > 0) {
+          setRomaneiosRetirada(data);
+        } else {
+          syncCollectionToFirestore('romaneiosRetirada', INITIAL_ROMANEIOS_RETIRADA);
+        }
+      });
+      unsubs.push(unsubRomaneios);
+
+      const unsubContasReceber = subscribeToCollection<ContaReceber>('contasReceber', (data) => {
+        if (data && data.length > 0) {
+          setContasReceber(data);
+        } else {
+          syncCollectionToFirestore('contasReceber', INITIAL_CONTAS_RECEBER);
+        }
+      });
+      unsubs.push(unsubContasReceber);
+
+      const unsubFornecedores = subscribeToCollection<Fornecedor>('fornecedores', (data) => {
+        if (data && data.length > 0) {
+          setFornecedores(data);
+        } else {
+          syncCollectionToFirestore('fornecedores', INITIAL_FORNECEDORES);
+        }
+      });
+      unsubs.push(unsubFornecedores);
+
+      const unsubCompras = subscribeToCollection<CompraOrdem>('compras', (data) => {
+        if (data && data.length > 0) {
+          setCompras(data);
+        } else {
+          syncCollectionToFirestore('compras', INITIAL_COMPRAS);
+        }
+      });
+      unsubs.push(unsubCompras);
+
+      const unsubRecebimentos = subscribeToCollection<Recebimento>('recebimentos', (data) => {
+        if (data && data.length > 0) {
+          setRecebimentos(data);
+        } else {
+          syncCollectionToFirestore('recebimentos', INITIAL_RECEBIMENTOS);
+        }
+      });
+      unsubs.push(unsubRecebimentos);
+
+      const unsubContasPagar = subscribeToCollection<ContaPagar>('contasPagar', (data) => {
+        if (data && data.length > 0) {
+          setContasPagar(data);
+        } else {
+          syncCollectionToFirestore('contasPagar', INITIAL_CONTAS_PAGAR);
+        }
+      });
+      unsubs.push(unsubContasPagar);
+
+      const unsubUsuarios = subscribeToCollection<AppUser>('usuarios', (data) => {
+        if (data && data.length > 0) {
+          setUsuarios(data);
+        } else {
+          syncCollectionToFirestore('usuarios', INITIAL_USERS);
+        }
+      });
+      unsubs.push(unsubUsuarios);
+    } catch (e) {
+      console.warn('Firebase Firestore real-time error:', e);
+    }
+
+    return () => {
+      unsubs.forEach((unsub) => {
+        try { unsub(); } catch (_) {}
+      });
+    };
+  }, []);
 
   // Revoke session if user status is set to 'Inativo' or deleted by Admin
   useEffect(() => {
@@ -933,6 +1048,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       pagamentosEfetuados: [],
     };
     setContasPagar((prev) => [novaConta, ...prev]);
+    saveDocumentToFirestore('contasPagar', novaConta);
     addToast(`Conta a Pagar (${novaConta.tipo}) ${codigo} cadastrada com sucesso!`, 'success');
     return novaConta;
   };
@@ -962,12 +1078,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           const totalPago = novosPags.reduce((sum, p) => sum + p.valor, 0);
           const novaSituacao = totalPago >= cp.valorTotal ? 'Paga' : 'Parcialmente Paga';
 
-          return {
+          const updated = {
             ...cp,
             valorPago: totalPago,
             situacao: novaSituacao as any,
             pagamentosEfetuados: novosPags,
           };
+          saveDocumentToFirestore('contasPagar', updated);
+          return updated;
         }
         return cp;
       })
@@ -988,6 +1106,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       recebimentosEfetuados: [],
     };
     setContasReceber((prev) => [novaConta, ...prev]);
+    saveDocumentToFirestore('contasReceber', novaConta);
     addToast(`Título em Contas a Receber ${codigo} gerado com sucesso!`, 'success');
     return novaConta;
   };
@@ -1016,12 +1135,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           const totalRec = novosRecs.reduce((sum, r) => sum + r.valor, 0);
           const novaSituacao = totalRec >= cr.valorTotal ? 'Recebido' : 'Parcialmente Recebido';
 
-          return {
+          const updated = {
             ...cr,
             valorRecebido: totalRec,
             situacao: novaSituacao as any,
             recebimentosEfetuados: novosRecs,
           };
+          saveDocumentToFirestore('contasReceber', updated);
+          return updated;
         }
         return cr;
       })
@@ -1045,7 +1166,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           const novoTotalValorVendido = item.totalValorVendidoHistorico + (pesoKgDeduzido * precoVendaKg);
           const novoPrecoMedio = novoTotalKgVendido > 0 ? (novoTotalValorVendido / novoTotalKgVendido) : item.precoMedioVenda;
 
-          return {
+          const updated = {
             ...item,
             caixas: novasCaixas,
             pesoKg: novoPesoKg,
@@ -1055,6 +1176,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             totalValorVendidoHistorico: novoTotalValorVendido,
             dataUltimaAtualizacao: new Date().toISOString().split('T')[0]
           };
+          saveDocumentToFirestore('estoqueBeneficiada', updated, 'tipo');
+          return updated;
         }
         return item;
       })
@@ -1070,12 +1193,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setEstoqueBeneficiada((prev) =>
       prev.map((item) => {
         if (item.tipo === tipoTarget) {
-          return {
+          const updated = {
             ...item,
             caixas: item.caixas + caixasAdicionadas,
             pesoKg: item.pesoKg + kg,
             dataUltimaAtualizacao: new Date().toISOString().split('T')[0]
           };
+          saveDocumentToFirestore('estoqueBeneficiada', updated, 'tipo');
+          return updated;
         }
         return item;
       })
@@ -1091,13 +1216,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setEstoqueBeneficiada((prev) =>
       prev.map((item) => {
         if (item.tipo === tipoTarget) {
-          return {
+          const updated = {
             ...item,
             caixas: novasCaixas,
             pesoKg: novasCaixas * 20,
             ultimoPrecoVenda: novoUltimoPreco !== undefined && novoUltimoPreco > 0 ? novoUltimoPreco : item.ultimoPrecoVenda,
             dataUltimaAtualizacao: new Date().toISOString().split('T')[0]
           };
+          saveDocumentToFirestore('estoqueBeneficiada', updated, 'tipo');
+          return updated;
         }
         return item;
       })
@@ -1146,6 +1273,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setExpedicoes((prev) => [novaExpedicao, ...prev]);
     setContasReceber((prev) => [novaContaReceber, ...prev]);
 
+    saveDocumentToFirestore('expedicoes', novaExpedicao);
+    saveDocumentToFirestore('contasReceber', novaContaReceber);
+
     // Deduct stock if Castanha Beneficiada
     if (expData.tipoCastanha === 'Castanha Beneficiada') {
       const subtipo = expData.subtipoBeneficiada || (expData.classificacao as TipoCastanhaBeneficiadaSubtipo);
@@ -1188,6 +1318,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     setRomaneiosRetirada((prev) => [novoRomaneio, ...prev]);
+    saveDocumentToFirestore('romaneiosRetirada', novoRomaneio);
 
     // Registrar log de auditoria
     registrarLogAuditoria(
@@ -1208,13 +1339,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           const quantidadeTotal = updatedItens.reduce((acc, i) => acc + (Number(i.quantidade) || 0), 0);
           const valorTotal = updatedItens.reduce((acc, i) => acc + (Number(i.valor) || 0), 0);
 
-          return {
+          const updated = {
             ...r,
             ...patch,
             numItensTotal,
             quantidadeTotal,
             valorTotal,
           };
+          saveDocumentToFirestore('romaneiosRetirada', updated);
+          return updated;
         }
         return r;
       })
@@ -1225,6 +1358,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const deleteRomaneioRetirada = (id: string) => {
     const target = romaneiosRetirada.find((r) => r.id === id);
     setRomaneiosRetirada((prev) => prev.filter((r) => r.id !== id));
+    deleteDocumentFromFirestore('romaneiosRetirada', id);
     if (target) {
       registrarLogAuditoria(`Excluiu Romaneio de Retirada ${target.codigo}`, target.codigo);
       addToast(`Romaneio de Retirada ${target.codigo} excluído com sucesso.`, 'warning');
@@ -1331,6 +1465,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ultimoAcesso: 'Nunca acessou'
     };
     setUsuarios((prev) => [newUser, ...prev]);
+    saveDocumentToFirestore('usuarios', newUser);
     registrarLogAuditoria('CRIAR_USUARIO', `Cadastrado novo usuário: ${newUser.nome} (${newUser.perfil})`);
     addToast(`Usuário ${newUser.nome} cadastrado com sucesso!`, 'success');
   };
@@ -1349,6 +1484,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           if (currentUser?.id === id) {
             setCurrentUser(updated);
           }
+          saveDocumentToFirestore('usuarios', updated);
           return updated;
         }
         return u;
@@ -1371,7 +1507,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const targetName = targetUser.nome;
 
     setUsuarios((prev) =>
-      prev.map((u) => (u.id === id ? { ...u, status: novoStatus } : u))
+      prev.map((u) => {
+        if (u.id === id) {
+          const updated = { ...u, status: novoStatus };
+          saveDocumentToFirestore('usuarios', updated);
+          return updated;
+        }
+        return u;
+      })
     );
 
     registrarLogAuditoria(
@@ -1391,6 +1534,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
 
     setUsuarios((prev) => prev.filter((u) => u.id !== id));
+    deleteDocumentFromFirestore('usuarios', id);
     registrarLogAuditoria('EXCLUIR_USUARIO', `Usuário excluído: ${target.nome} (${target.login})`);
     addToast(`Usuário ${target.nome} removido com sucesso.`, 'info');
   };
@@ -2006,13 +2150,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       dataCadastro: new Date().toISOString().split('T')[0],
     };
     setFornecedores((prev) => [newFornecedor, ...prev]);
+    saveDocumentToFirestore('fornecedores', newFornecedor);
     addToast(`Fornecedor ${newFornecedor.nomeCompleto} cadastrado com sucesso!`);
     return newFornecedor;
   };
 
   const updateFornecedor = (id: string, patch: Partial<Fornecedor>) => {
     setFornecedores((prev) =>
-      prev.map((f) => (f.id === id ? { ...f, ...patch } : f))
+      prev.map((f) => {
+        if (f.id === id) {
+          const updated = { ...f, ...patch };
+          saveDocumentToFirestore('fornecedores', updated);
+          return updated;
+        }
+        return f;
+      })
     );
     addToast('Dados do fornecedor atualizados com sucesso.');
   };
@@ -2029,18 +2181,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       totalKgComprado: cData.totalKgComprado || 0,
     };
     setClientes((prev) => [newCliente, ...prev]);
+    saveDocumentToFirestore('clientes', newCliente);
     addToast(`Cliente ${newCliente.nome} cadastrado com sucesso!`, 'success');
     registrarLogAuditoria('CADASTRO_CLIENTE', `Novo cliente cadastrado: ${newCliente.nome} (${newCliente.cpfCnpj})`);
     return newCliente;
   };
 
   const updateCliente = (id: string, patch: Partial<Cliente>) => {
-    setClientes((prev) => prev.map((c) => (c.id === id ? { ...c, ...patch } : c)));
+    setClientes((prev) =>
+      prev.map((c) => {
+        if (c.id === id) {
+          const updated = { ...c, ...patch };
+          saveDocumentToFirestore('clientes', updated);
+          return updated;
+        }
+        return c;
+      })
+    );
     addToast('Dados do cliente atualizados com sucesso.', 'info');
   };
 
   const deleteCliente = (id: string) => {
     setClientes((prev) => prev.filter((c) => c.id !== id));
+    deleteDocumentFromFirestore('clientes', id);
     addToast('Cliente removido do cadastro.', 'info');
   };
 
@@ -2070,6 +2233,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     setRecebimentos((prev) => [newRec, ...prev]);
+    saveDocumentToFirestore('recebimentos', newRec);
 
     // Also auto update or create Lote if requested
     if (newRec.loteId) {
@@ -2128,6 +2292,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     setCompras((prev) => [novaCompra, ...prev]);
+    saveDocumentToFirestore('compras', novaCompra);
     registrarLogAuditoria(
       'NOVA_COMPRA_REGISTRADA',
       `Nova compra ${codigo} negociada com ${novaCompra.fornecedorNome} (${novaCompra.quantidadeHectolitrosPrevista} Hl)`
@@ -2145,20 +2310,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     observacoesAdd?: string
   ) => {
     setCompras((prev) =>
-      prev.map((c) =>
-        c.id === compraId
-          ? {
-              ...c,
-              status: 'Recebido',
-              recebimentoId,
-              recebimentoCodigo,
-              dataRecebimento: new Date().toISOString().split('T')[0],
-              quantidadeHectolitrosPrevista: finalVolumeHl !== undefined ? Math.max(c.quantidadeHectolitrosPrevista, finalVolumeHl) : c.quantidadeHectolitrosPrevista,
-              valorTotalEstimado: finalValorTotal !== undefined ? Math.max(c.valorTotalEstimado, finalValorTotal) : c.valorTotalEstimado,
-              observacoes: observacoesAdd ? `${c.observacoes ? c.observacoes + ' | ' : ''}${observacoesAdd}` : c.observacoes,
-            }
-          : c
-      )
+      prev.map((c) => {
+        if (c.id === compraId) {
+          const updated = {
+            ...c,
+            status: 'Recebido' as const,
+            recebimentoId,
+            recebimentoCodigo,
+            dataRecebimento: new Date().toISOString().split('T')[0],
+            quantidadeHectolitrosPrevista: finalVolumeHl !== undefined ? Math.max(c.quantidadeHectolitrosPrevista, finalVolumeHl) : c.quantidadeHectolitrosPrevista,
+            valorTotalEstimado: finalValorTotal !== undefined ? Math.max(c.valorTotalEstimado, finalValorTotal) : c.valorTotalEstimado,
+            observacoes: observacoesAdd ? `${c.observacoes ? c.observacoes + ' | ' : ''}${observacoesAdd}` : c.observacoes,
+          };
+          saveDocumentToFirestore('compras', updated);
+          return updated;
+        }
+        return c;
+      })
     );
   };
 
@@ -2440,6 +2608,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   return (
     <AppContext.Provider
       value={{
+        isFirebaseConnected,
         activeTab,
         setActiveTab,
         activePerfil,

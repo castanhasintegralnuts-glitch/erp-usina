@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { Menu, ArrowLeft, PackagePlus, ShieldCheck, LogOut, Building2 } from 'lucide-react';
+import { Menu, ArrowLeft, PackagePlus, ShieldCheck, LogOut, Building2, Database } from 'lucide-react';
 
 import logoImg from '../assets/images/integral_nuts_logo_1785983199171.jpg';
 
@@ -11,6 +11,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onToggleMenu, onOpenNovoRecebimento }) => {
   const {
+    isFirebaseConnected,
     activeTab,
     setActiveTab,
     currentUser,
@@ -115,6 +116,12 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMenu, onOpenNovoRecebime
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Firebase Firestore Connection Status */}
+          <div className="hidden sm:flex items-center gap-1.5 bg-sky-50/90 px-2.5 py-1 rounded-xl border border-sky-200 text-xs text-sky-900 font-bold" title="Banco de dados Firestore ativado e sincronizado em tempo real">
+            <Database className={`w-3.5 h-3.5 ${isFirebaseConnected ? 'text-sky-600 animate-pulse' : 'text-slate-400'}`} />
+            <span>{isFirebaseConnected ? 'Firestore Ativo' : 'Conectando...'}</span>
           </div>
 
           {/* Active User Switcher Badge */}
